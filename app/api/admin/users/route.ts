@@ -4,13 +4,11 @@ import { getUserRiskFlags } from '@/lib/adminDb';
 
 export async function GET(request: NextRequest) {
   try {
-    // Seed demo users if needed - force seed on every call to ensure we have enough users
-    if (db.users.size < 20) {
-      seedAdminDemoUsers();
-      // Also directly call seedDemoUsers to ensure it runs
-      const { seedDemoUsers } = require('@/lib/adminMockData');
-      seedDemoUsers();
-    }
+    // Always seed demo users - Vercel serverless resets on each invocation
+    // The seedDemoUsers function checks for duplicates by email
+    const { seedDemoUsers } = require('@/lib/adminMockData');
+    seedDemoUsers();
+    
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const kycStatus = searchParams.get('kycStatus');
