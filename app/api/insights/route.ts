@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   }
 
   const portfolio = getPortfolio(user.id);
-  const insights = generateAIInsights(portfolio, mockStocks);
+  const insights = generateAIInsights(portfolio || null, mockStocks);
 
   return NextResponse.json({ insights });
 }
