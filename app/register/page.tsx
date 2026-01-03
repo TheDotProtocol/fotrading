@@ -133,7 +133,7 @@ export default function RegisterPage() {
               <>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                   <p className="text-sm text-blue-800">
-                    <strong>Demo Mode:</strong> We've sent a verification code to {formData.email}
+                    <strong>Demo Mode:</strong> We&apos;ve sent a verification code to {formData.email}
                     <br />
                     <span className="text-blue-600">Use any 6-digit code to continue (e.g., 123456)</span>
                   </p>

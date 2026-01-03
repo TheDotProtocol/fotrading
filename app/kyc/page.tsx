@@ -253,7 +253,7 @@ export default function KYCPage() {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p className="text-sm text-blue-800">
                   <strong>Auto-Scan Simulation:</strong> In a real system, your documents would be automatically
-                  scanned and verified. For this demo, we'll simulate an instant approval.
+                  scanned and verified. For this demo, we&apos;ll simulate an instant approval.
                 </p>
               </div>
               {!showSuccessMessage ? (
