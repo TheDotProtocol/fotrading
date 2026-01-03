@@ -236,19 +236,52 @@ export default function UserDetailPage() {
                     {user.kycStatus === 'PENDING' && (
                       <>
                         <button
-                          onClick={() => handleAction('approve_kyc')}
+                          onClick={async () => {
+                            const response = await fetch('/api/admin/kyc', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ userId: user.id, action: 'approve' }),
+                            })
+                            if (response.ok) {
+                              alert('KYC approved successfully')
+                              window.location.reload()
+                            }
+                          }}
                           className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium"
                         >
                           Approve
                         </button>
                         <button
-                          onClick={() => handleAction('reject_kyc')}
+                          onClick={async () => {
+                            const reason = prompt('Enter rejection reason:')
+                            if (reason) {
+                              const response = await fetch('/api/admin/kyc', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ userId: user.id, action: 'reject', rejectionReason: reason }),
+                              })
+                              if (response.ok) {
+                                alert('KYC rejected')
+                                window.location.reload()
+                              }
+                            }
+                          }}
                           className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium"
                         >
                           Reject
                         </button>
                         <button
-                          onClick={() => handleAction('request_resubmit')}
+                          onClick={async () => {
+                            const response = await fetch('/api/admin/kyc', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ userId: user.id, action: 'resubmit' }),
+                            })
+                            if (response.ok) {
+                              alert('Resubmission requested')
+                              window.location.reload()
+                            }
+                          }}
                           className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium"
                         >
                           Request Resubmit
@@ -257,10 +290,55 @@ export default function UserDetailPage() {
                     )}
                   </div>
                 </div>
+                
+                {/* KYC Status Display */}
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    {user.kycStatus === 'APPROVED' && <CheckCircle className="w-6 h-6 text-green-600" />}
+                    {user.kycStatus === 'REJECTED' && <XCircle className="w-6 h-6 text-red-600" />}
+                    {user.kycStatus === 'PENDING' && <Clock className="w-6 h-6 text-yellow-600" />}
+                    <span className="text-lg font-semibold text-gray-900">Status: {user.kycStatus}</span>
+                  </div>
+                  
+                  {/* Show rejection reason if rejected */}
+                  {user.kycStatus === 'REJECTED' && (user as any).rejectionReason && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <p className="text-sm font-medium text-red-900 mb-1">Rejection Reason:</p>
+                      <p className="text-sm text-red-800">{(user as any).rejectionReason}</p>
+                      {(user as any).rejectedAt && (
+                        <p className="text-xs text-red-600 mt-2">
+                          Rejected on: {new Date((user as any).rejectedAt).toLocaleDateString()}
+                          {(user as any).reviewedBy && ` by ${(user as any).reviewedBy}`}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <div className="bg-gray-50 rounded-lg p-6">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 mb-4">
                     KYC documents preview would appear here. In a real system, this would show uploaded NRIC, selfie, and other verification documents.
                   </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white p-4 rounded border border-gray-200">
+                      <p className="text-xs text-gray-500 mb-2">NRIC Front</p>
+                      <div className="h-32 bg-gray-100 rounded flex items-center justify-center">
+                        <FileText className="w-8 h-8 text-gray-400" />
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded border border-gray-200">
+                      <p className="text-xs text-gray-500 mb-2">NRIC Back</p>
+                      <div className="h-32 bg-gray-100 rounded flex items-center justify-center">
+                        <FileText className="w-8 h-8 text-gray-400" />
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded border border-gray-200 col-span-2">
+                      <p className="text-xs text-gray-500 mb-2">Selfie</p>
+                      <div className="h-32 bg-gray-100 rounded flex items-center justify-center">
+                        <User className="w-8 h-8 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

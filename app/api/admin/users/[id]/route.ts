@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import db from '@/lib/db';
+import db, { getKYCData } from '@/lib/db';
 import { getUserRiskFlags } from '@/lib/adminDb';
 
 export async function GET(
@@ -21,6 +21,7 @@ export async function GET(
     const orders = db.orders.get(userId) || [];
     const transactions = db.transactions.get(userId) || [];
     const riskFlags = getUserRiskFlags(userId);
+    const kycData = getKYCData(userId);
     const highestRisk = riskFlags.length > 0 
       ? riskFlags.reduce((max, flag) => 
           flag.level === 'HIGH' ? flag : 
@@ -45,6 +46,9 @@ export async function GET(
       portfolio: portfolio,
       trades: orders.slice(0, 50).reverse(), // Latest 50 trades
       transactions: transactions.slice(0, 50).reverse(), // Latest 50 transactions
+      rejectionReason: kycData?.rejectionReason,
+      rejectedAt: kycData?.rejectedAt,
+      reviewedBy: kycData?.reviewedBy,
     };
 
     return NextResponse.json({ user: userDetail });

@@ -11,6 +11,9 @@ interface KYCUser {
   email: string
   kycStatus: string
   submittedAt?: string
+  rejectionReason?: string
+  rejectedAt?: string
+  reviewedBy?: string
 }
 
 export default function KYCReviewPage() {
@@ -43,12 +46,12 @@ export default function KYCReviewPage() {
     }
   }
 
-  const handleKycAction = async (userId: string, action: string) => {
+  const handleKycAction = async (userId: string, action: string, reason?: string) => {
     try {
       const response = await fetch('/api/admin/kyc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, action }),
+        body: JSON.stringify({ userId, action, rejectionReason: reason }),
       })
       if (response.ok) {
         fetchKYCUsers()

@@ -13,6 +13,9 @@ export interface KYCData {
   riskCategory?: 'Retail' | 'Professional';
   submittedAt?: string;
   approvedAt?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
+  reviewedBy?: string;
 }
 
 export interface Transaction {

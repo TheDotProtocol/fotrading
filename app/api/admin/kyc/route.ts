@@ -25,6 +25,9 @@ export async function GET(request: NextRequest) {
         email: user.email,
         kycStatus: user.kycStatus,
         submittedAt: kycData?.submittedAt,
+        rejectionReason: kycData?.rejectionReason,
+        rejectedAt: kycData?.rejectedAt,
+        reviewedBy: kycData?.reviewedBy,
       };
     });
 
@@ -39,8 +42,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, action } = await request.json();
+    const { userId, action, rejectionReason } = await request.json();
     const adminId = request.cookies.get('adminSession')?.value || 'admin_1';
+    
+    // Get admin name
+    let adminName = 'Admin';
+    try {
+      const { getAdminUser } = require('@/lib/adminDb');
+      const admin = getAdminUser('admin'); // Default to admin user
+      adminName = admin?.name || 'Admin';
+    } catch (e) {
+      // Fallback
+    }
 
     const user = db.users.get(userId);
     if (!user) {
@@ -62,6 +75,9 @@ export async function POST(request: NextRequest) {
     updateKYCData(userId, {
       kycStatus: newStatus,
       approvedAt: action === 'approve' ? new Date().toISOString() : undefined,
+      rejectedAt: action === 'reject' ? new Date().toISOString() : undefined,
+      rejectionReason: action === 'reject' ? (rejectionReason || 'KYC verification failed') : undefined,
+      reviewedBy: adminName,
     });
 
     user.kycStatus = newStatus;

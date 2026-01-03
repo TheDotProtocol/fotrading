@@ -31,7 +31,7 @@ db.users.set(demoUser.id, demoUser);
 // Seed additional demo users for admin portal (lazy load to avoid circular dependency)
 let demoUsersSeeded = false;
 export const seedAdminDemoUsers = () => {
-  if (!demoUsersSeeded && db.users.size < 5) {
+  if (!demoUsersSeeded || db.users.size < 20) {
     const { seedDemoUsers } = require('./adminMockData');
     seedDemoUsers();
     demoUsersSeeded = true;
