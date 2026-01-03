@@ -5,10 +5,8 @@ import { Transaction, Order } from '@/types';
 
 // Generate 20+ demo users with realistic data (15+ total, 5 pending KYC)
 export const seedDemoUsers = () => {
-  // Check if already seeded
-  if (db.users.size > 20) {
-    return; // Already seeded
-  }
+  // Always seed - Vercel serverless functions reset on each invocation
+  // Check by email to avoid duplicates
 
   const users = [
     // Approved users (10)

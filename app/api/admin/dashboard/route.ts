@@ -4,12 +4,9 @@ import db, { seedAdminDemoUsers } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
-    // Seed demo users if needed - force seed to ensure we have enough users
-    if (db.users.size < 20) {
-      seedAdminDemoUsers();
-      const { seedDemoUsers } = require('@/lib/adminMockData');
-      seedDemoUsers();
-    }
+    // Always seed demo users - Vercel serverless resets on each invocation
+    const { seedDemoUsers } = require('@/lib/adminMockData');
+    seedDemoUsers();
     const metrics = getDashboardMetrics();
 
     // Generate realistic chart data (last 30 days) based on actual orders
