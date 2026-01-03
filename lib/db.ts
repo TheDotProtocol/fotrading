@@ -28,6 +28,16 @@ demoUser.kycStatus = 'APPROVED';
 demoUser.riskCategory = 'Retail';
 db.users.set(demoUser.id, demoUser);
 
+// Seed additional demo users for admin portal (lazy load to avoid circular dependency)
+let demoUsersSeeded = false;
+export const seedAdminDemoUsers = () => {
+  if (!demoUsersSeeded && db.users.size < 5) {
+    const { seedDemoUsers } = require('./adminMockData');
+    seedDemoUsers();
+    demoUsersSeeded = true;
+  }
+};
+
 // Seed demo portfolio
 const demoHoldings: Holding[] = [
   {
