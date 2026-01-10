@@ -588,7 +588,13 @@ export default function MarketPage() {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  )) : (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
+                        Loading cryptocurrency data...
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
