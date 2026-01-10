@@ -7,8 +7,9 @@ import { Search, TrendingUp, TrendingDown, BarChart3, Coins, DollarSign, Trendin
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { TradingViewMarketOverview } from '@/components/TradingViewWidget'
-import { marketIndices, futures, currencies, etfs, bonds, cryptocurrencies } from '@/lib/marketData'
+import { marketIndices, futures, currencies, etfs, bonds } from '@/lib/marketData'
 import { TradeModal } from '@/components/TradeModal'
+import { SimulationBanner } from '@/components/SimulationBanner'
 
 type MarketTab = 'overview' | 'indices' | 'stocks' | 'futures' | 'forex' | 'etfs' | 'bonds' | 'crypto'
 
@@ -23,15 +24,18 @@ export default function MarketPage() {
     instrument: any
   }>({ isOpen: false, instrument: null })
 
+  const [cryptocurrencies, setCryptocurrencies] = useState<any[]>([])
+
   useEffect(() => {
-    const fetchStocks = async () => {
+    const fetchMarketData = async () => {
       const res = await fetch('/api/market')
       const data = await res.json()
-      setStocks(data.stocks)
+      setStocks(data.stocks || [])
+      setCryptocurrencies(data.cryptocurrencies || [])
     }
 
-    fetchStocks()
-    const interval = setInterval(fetchStocks, 15000) // Refresh every 15s
+    fetchMarketData()
+    const interval = setInterval(fetchMarketData, 3000) // Refresh every 3s (faster for simulation)
 
     return () => clearInterval(interval)
   }, [setStocks])
@@ -102,6 +106,9 @@ export default function MarketPage() {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Malaysia Markets</h1>
+        
+        {/* Simulation Mode Banner */}
+        <SimulationBanner />
 
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow-md mb-6 overflow-x-auto">
@@ -213,6 +220,9 @@ export default function MarketPage() {
         {/* Stocks Tab */}
         {activeTab === 'stocks' && (
           <div className="space-y-6">
+            {/* Simulation Banner */}
+            <SimulationBanner />
+            
             {/* Search and Filters */}
             <div className="bg-white rounded-lg shadow-md p-4">
               <div className="flex flex-col md:flex-row gap-4">
@@ -524,6 +534,9 @@ export default function MarketPage() {
               <h2 className="text-xl font-semibold">Cryptocurrency Markets</h2>
               <p className="text-sm text-gray-500 mt-1">Trade cryptocurrencies 24/7 with low fees</p>
             </div>
+            <div className="p-4">
+              <SimulationBanner />
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
@@ -538,7 +551,7 @@ export default function MarketPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {cryptocurrencies.map((crypto) => (
+                  {cryptocurrencies.length > 0 ? cryptocurrencies.map((crypto) => (
                     <tr key={crypto.symbol} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-gray-900">{crypto.symbol}</td>
                       <td className="px-6 py-4 text-gray-900">{crypto.name}</td>

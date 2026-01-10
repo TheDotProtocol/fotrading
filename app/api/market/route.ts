@@ -1,23 +1,52 @@
 import { NextResponse } from 'next/server';
-import { mockStocks } from '@/lib/mockData';
+import { ensureMarketEngineStarted } from '@/lib/marketEngineInit';
+import { getAllCurrentPrices, getEquityAssets, getCryptoAssets } from '@/market-engine';
 
 export async function GET() {
-  // Simulate price fluctuations
-  const stocks = mockStocks.map(stock => {
-    const variance = (Math.random() - 0.5) * 0.1; // ±5% variance
-    const newPrice = stock.price * (1 + variance);
-    const change = newPrice - stock.price;
-    const changePercent = (change / stock.price) * 100;
+  ensureMarketEngineStarted();
+  
+  // Get all current prices from market engine
+  const allAssets = getAllCurrentPrices();
+  const equities = getEquityAssets();
+  const cryptos = getCryptoAssets();
+  
+  // Format stocks for compatibility
+  const stocks = equities.map(asset => ({
+    ticker: asset.symbol,
+    name: asset.name,
+    price: asset.lastPrice,
+    change: asset.dailyChange,
+    changePercent: asset.dailyChangePercent,
+    volume: asset.volume,
+    sector: asset.sector || '',
+  }));
+  
+  // Format cryptos
+  const cryptocurrencies = cryptos.map(asset => ({
+    symbol: asset.symbol,
+    name: asset.name,
+    price: asset.lastPrice,
+    change: asset.dailyChange,
+    changePercent: asset.dailyChangePercent,
+    volume: asset.volume,
+    marketCap: asset.marketCap,
+  }));
 
-    return {
-      ...stock,
-      price: Math.round(newPrice * 100) / 100,
-      change: Math.round(change * 100) / 100,
-      changePercent: Math.round(changePercent * 100) / 100,
-      volume: Math.floor(stock.volume * (0.8 + Math.random() * 0.4)), // ±20% volume variance
-    };
+  return NextResponse.json({ 
+    stocks,
+    cryptocurrencies,
+    allAssets: allAssets.map(asset => ({
+      assetId: asset.assetId,
+      symbol: asset.symbol,
+      name: asset.name,
+      assetType: asset.assetType,
+      currency: asset.currency,
+      lastPrice: asset.lastPrice,
+      dailyChange: asset.dailyChange,
+      dailyChangePercent: asset.dailyChangePercent,
+      volume: asset.volume,
+      marketStatus: asset.marketStatus,
+    })),
   });
-
-  return NextResponse.json({ stocks });
 }
 

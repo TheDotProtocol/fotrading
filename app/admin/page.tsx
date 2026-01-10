@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Lock, User, Shield } from 'lucide-react'
+import Image from 'next/image'
+import { Lock, User } from 'lucide-react'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -52,8 +53,15 @@ export default function AdminLoginPage() {
       <div className="max-w-md w-full">
         {/* Logo/Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-full mb-4">
-            <Shield className="w-8 h-8 text-white" />
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/logo/logo.jpeg"
+              alt="Xentro Logo"
+              width={150}
+              height={50}
+              className="h-12 w-auto object-contain"
+              priority
+            />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Admin Portal</h1>
           <p className="text-gray-400">Xentro Administration</p>
@@ -131,7 +139,7 @@ export default function AdminLoginPage() {
                 </>
               ) : (
                 <>
-                  <Shield className="w-5 h-5" />
+                  <Lock className="w-5 h-5" />
                   Sign In
                 </>
               )}

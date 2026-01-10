@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { addOrder, getOrders, getPortfolio } from '@/lib/db';
-import { calculateFees } from '@/lib/mockData';
-import { Order } from '@/types';
+import { ensureMarketEngineStarted } from '@/lib/marketEngineInit';
+import { getUserOrders, executeMarketOrder, placeLimitOrder } from '@/market-engine';
+import { getAssetBySymbol } from '@/market-engine';
 
 export async function GET(request: NextRequest) {
   const user = await getCurrentUser();
@@ -10,8 +10,30 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const orders = getOrders(user.id);
-  return NextResponse.json({ orders });
+  ensureMarketEngineStarted();
+  const orders = getUserOrders(user.id);
+  
+  // Convert TradeOrder to Order format for compatibility
+  const formattedOrders = orders.map(order => ({
+    id: order.orderId,
+    userId: order.userId,
+    orderType: order.side === 'LONG' || order.side === 'BUY' ? 'BUY' : 'SELL',
+    ticker: order.symbol,
+    qty: order.quantity,
+    price: order.filledPrice || order.price || order.limitPrice || 0,
+    orderPrice: order.limitPrice || order.filledPrice || order.price || 0,
+    orderTypeDetail: order.orderType,
+    status: order.status,
+    brokerageFee: order.fees.brokerage || 0,
+    clearingFee: order.fees.clearing || 0,
+    stampDuty: order.fees.stamp || 0,
+    totalAmount: order.totalAmount,
+    createdAt: new Date(order.createdAt).toISOString(),
+    filledAt: order.filledAt ? new Date(order.filledAt).toISOString() : undefined,
+    instrumentType: order.assetType === 'CRYPTO' ? 'CRYPTO' : 'STOCK',
+  }));
+  
+  return NextResponse.json({ orders: formattedOrders });
 }
 
 export async function POST(request: NextRequest) {
@@ -20,87 +42,101 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  ensureMarketEngineStarted();
+  
   const body = await request.json();
-  const { orderType, ticker, qty, price, orderTypeDetail, instrumentType, contractSize, lotSize } = body;
+  const { orderType, ticker, qty, price, orderTypeDetail, instrumentType, limitPrice } = body;
 
-  if (!orderType || !ticker || !qty || !price) {
+  if (!orderType || !ticker || !qty) {
     return NextResponse.json(
       { error: 'Missing required fields' },
       { status: 400 }
     );
   }
 
-  // Calculate amount and fees based on instrument type
-  let amount = 0;
-  let fees = { brokerage: 0, clearing: 0, stamp: 0, total: 0 };
-  let margin = 0;
-
-  if (instrumentType === 'FUTURE') {
-    // Futures: qty * price * contract size, but only margin is required
-    const contractSizeValue = contractSize || 100;
-    amount = qty * price * contractSizeValue;
-    margin = amount * 0.1; // 10% margin
-    fees.brokerage = margin * 0.001;
-    fees.clearing = margin * 0.0003;
-    fees.total = fees.brokerage + fees.clearing;
-  } else if (instrumentType === 'FOREX') {
-    // Forex: qty (lots) * lot size * price
-    const lotSizeValue = lotSize || 100000;
-    amount = qty * lotSizeValue * price;
-    const spread = amount * 0.0001; // 1 pip spread
-    fees.total = spread;
-  } else if (instrumentType === 'BOND') {
-    // Bonds: qty * price (as percentage) * face value (assume MYR 1000)
-    amount = qty * (price / 100) * 1000;
-    fees = calculateFees(amount, qty);
-  } else if (instrumentType === 'CRYPTO') {
-    // Cryptocurrency: qty * price, typically lower fees
-    amount = qty * price;
-    const tradingFee = amount * 0.001; // 0.1% trading fee
-    fees = { brokerage: tradingFee, clearing: 0, stamp: 0, total: tradingFee };
-  } else {
-    // Stocks and ETFs
-    amount = qty * price;
-    fees = calculateFees(amount, qty);
+  // Find asset by symbol
+  const asset = getAssetBySymbol(ticker);
+  if (!asset) {
+    return NextResponse.json(
+      { error: `Asset ${ticker} not found` },
+      { status: 400 }
+    );
   }
 
-  const totalAmount = (instrumentType === 'FUTURE' ? margin : amount) + fees.total;
+  // Check wallet balance
+  const { getWallet } = await import('@/market-engine/wallet');
+  const wallet = getWallet(user.id);
+  if (!wallet) {
+    return NextResponse.json(
+      { error: 'Wallet not found' },
+      { status: 400 }
+    );
+  }
 
-  // Get portfolio to check cash balance for BUY orders
-  const portfolio = getPortfolio(user.id);
-  if (orderType === 'BUY' && portfolio) {
-    if (portfolio.cashBalance < totalAmount) {
+  // Determine order side
+  const side: 'BUY' | 'SELL' | 'LONG' | 'SHORT' = 
+    (instrumentType === 'CRYPTO' || instrumentType === 'FUTURE' || instrumentType === 'FOREX')
+      ? (orderType === 'BUY' ? 'LONG' : 'SHORT')
+      : (orderType === 'BUY' ? 'BUY' : 'SELL');
+
+  // Check balance for buy orders
+  if (side === 'BUY' || side === 'LONG') {
+    const currentPrice = asset.lastPrice;
+    const estimatedCost = qty * currentPrice;
+    const currency = asset.currency;
+    
+    if (currency === 'MYR' && wallet.balances.MYR < estimatedCost * 1.1) { // 10% buffer for fees
       return NextResponse.json(
-        { error: 'Insufficient funds' },
+        { error: 'Insufficient MYR balance' },
+        { status: 400 }
+      );
+    }
+    if (currency === 'USDT' && wallet.balances.USDT < estimatedCost * 1.1) {
+      return NextResponse.json(
+        { error: 'Insufficient USDT balance' },
         { status: 400 }
       );
     }
   }
 
-  // Create order (in demo, market orders are filled immediately)
-  const order: Order = {
-    id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    userId: user.id,
-    orderType,
-    ticker,
-    qty,
-    price,
-    orderPrice: orderTypeDetail === 'LIMIT' ? body.limitPrice : price,
-    orderTypeDetail: orderTypeDetail || 'MARKET',
-    status: orderTypeDetail === 'LIMIT' ? 'PENDING' : 'FILLED',
-    brokerageFee: fees.brokerage,
-    clearingFee: fees.clearing,
-    stampDuty: fees.stamp,
-    totalAmount,
-    createdAt: new Date().toISOString(),
-    filledAt: orderTypeDetail === 'MARKET' ? new Date().toISOString() : undefined,
-    instrumentType: instrumentType || 'STOCK',
-    contractSize: contractSize,
-    lotSize: lotSize,
-    margin: instrumentType === 'FUTURE' ? margin : undefined,
-  };
+  // Execute or place order
+  let tradeOrder;
+  try {
+    if (orderTypeDetail === 'LIMIT' && limitPrice) {
+      tradeOrder = placeLimitOrder(user.id, asset.assetId, side, qty, limitPrice);
+    } else {
+      tradeOrder = executeMarketOrder(user.id, asset.assetId, side, qty);
+      
+      // Update wallet after trade
+      const { updateWalletAfterTrade } = await import('@/market-engine/wallet');
+      updateWalletAfterTrade(user.id, tradeOrder);
+    }
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || 'Failed to execute order' },
+      { status: 400 }
+    );
+  }
 
-  addOrder(order);
+  // Convert to Order format for compatibility
+  const order = {
+    id: tradeOrder.orderId,
+    userId: tradeOrder.userId,
+    orderType: side === 'LONG' || side === 'BUY' ? 'BUY' : 'SELL',
+    ticker: tradeOrder.symbol,
+    qty: tradeOrder.quantity,
+    price: tradeOrder.filledPrice || tradeOrder.price || tradeOrder.limitPrice || 0,
+    orderPrice: tradeOrder.limitPrice || tradeOrder.filledPrice || tradeOrder.price || 0,
+    orderTypeDetail: tradeOrder.orderType,
+    status: tradeOrder.status,
+    brokerageFee: tradeOrder.fees.brokerage || 0,
+    clearingFee: tradeOrder.fees.clearing || 0,
+    stampDuty: tradeOrder.fees.stamp || 0,
+    totalAmount: tradeOrder.totalAmount,
+    createdAt: new Date(tradeOrder.createdAt).toISOString(),
+    filledAt: tradeOrder.filledAt ? new Date(tradeOrder.filledAt).toISOString() : undefined,
+    instrumentType: tradeOrder.assetType === 'CRYPTO' ? 'CRYPTO' : 'STOCK',
+  };
 
   return NextResponse.json({ order });
 }

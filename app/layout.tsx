@@ -9,6 +9,11 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Xentro - Malaysian Stock Trading Platform',
   description: 'Trade Bursa Malaysia stocks with ease. Demo platform for testing and demonstration purposes only.',
+  icons: {
+    icon: '/logo/logo.jpeg',
+    shortcut: '/logo/logo.jpeg',
+    apple: '/logo/logo.jpeg',
+  },
 }
 
 export default function RootLayout({

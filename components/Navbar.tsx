@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useStore } from '@/lib/store'
-import { Wallet, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 export function Navbar() {
@@ -18,8 +19,14 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
-            <Wallet className="w-8 h-8 text-primary-600" />
-            <span className="text-xl font-bold text-gray-800">Xentro</span>
+            <Image
+              src="/logo/logo.jpeg"
+              alt="Xentro Logo"
+              width={120}
+              height={40}
+              className="h-8 w-auto object-contain"
+              priority
+            />
           </Link>
 
           {/* Desktop Menu */}

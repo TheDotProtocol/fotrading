@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { getPortfolio } from '@/lib/db';
-import { generateAIInsights, mockStocks } from '@/lib/mockData';
+import { ensureMarketEngineStarted } from '@/lib/marketEngineInit';
+import { generateInsights, getUserInsights } from '@/market-engine';
 
 export async function GET(request: NextRequest) {
   const user = await getCurrentUser();
@@ -9,9 +9,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const portfolio = getPortfolio(user.id);
-  const insights = generateAIInsights(portfolio || null, mockStocks);
+  ensureMarketEngineStarted();
+  
+  // Generate fresh insights
+  const insights = generateInsights(user.id);
+  
+  // Convert to old format for compatibility
+  const formattedInsights = insights.map(insight => ({
+    id: insight.id,
+    type: insight.type,
+    title: insight.title,
+    message: insight.message,
+    priority: insight.priority,
+    createdAt: new Date(insight.createdAt).toISOString(),
+  }));
 
-  return NextResponse.json({ insights });
+  return NextResponse.json({ insights: formattedInsights });
 }
 

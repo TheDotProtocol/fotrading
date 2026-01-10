@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export function Footer() {
   return (
@@ -6,7 +7,13 @@ export function Footer() {
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white font-semibold mb-4">Xentro</h3>
+            <Image
+              src="/logo/logo.jpeg"
+              alt="Xentro Logo"
+              width={120}
+              height={40}
+              className="h-8 w-auto object-contain mb-4"
+            />
             <p className="text-sm">
               A modern platform for Malaysian investors trading stocks, futures, forex, ETFs, bonds, and cryptocurrencies.
             </p>
