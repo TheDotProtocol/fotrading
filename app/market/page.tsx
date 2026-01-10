@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useStore } from '@/lib/store'
 import { Stock } from '@/types'
-import { Search, TrendingUp, TrendingDown, BarChart3, Coins, DollarSign, TrendingUp as FutureIcon, Globe, Bitcoin } from 'lucide-react'
+import { Search, TrendingUp, TrendingDown, BarChart3, Coins, DollarSign, TrendingUp as FutureIcon, Globe, Bitcoin, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { TradingViewMarketOverview } from '@/components/TradingViewWidget'
+import { TradingViewMarketOverview, TradingViewWidget } from '@/components/TradingViewWidget'
 import { marketIndices, futures, currencies, etfs, bonds } from '@/lib/marketData'
 import { TradeModal } from '@/components/TradeModal'
 import { SimulationBanner } from '@/components/SimulationBanner'
@@ -25,6 +25,7 @@ export default function MarketPage() {
   }>({ isOpen: false, instrument: null })
 
   const [cryptocurrencies, setCryptocurrencies] = useState<any[]>([])
+  const [expandedStock, setExpandedStock] = useState<string | null>(null) // Track which stock row is expanded
 
   useEffect(() => {
     const fetchMarketData = async () => {
@@ -266,71 +267,150 @@ export default function MarketPage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredStocks.map((stock) => (
-                      <tr key={stock.ticker} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-semibold text-gray-900">{stock.ticker}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{stock.name}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className="text-sm font-medium text-gray-900">
-                            {stock.price.toFixed(2)}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className={`text-sm font-medium flex items-center justify-end gap-1 ${
-                            stock.change >= 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {stock.change >= 0 ? (
-                              <TrendingUp className="w-4 h-4" />
-                            ) : (
-                              <TrendingDown className="w-4 h-4" />
-                            )}
-                            {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className={`text-sm font-medium ${
-                            stock.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-500">{stock.sector}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className="text-sm text-gray-500">
-                            {(stock.volume / 1000000).toFixed(2)}M
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            <Link
-                              href={`/stock/${stock.ticker}`}
-                              className="text-primary-600 hover:text-primary-800 font-medium text-sm"
-                            >
-                              View →
-                            </Link>
-                            <span className="text-gray-300">|</span>
-                            <button
-                              onClick={() => setTradeModal({
-                                isOpen: true,
-                                instrument: {
-                                  symbol: stock.ticker,
-                                  name: stock.name,
-                                  price: stock.price,
-                                  type: 'STOCK',
-                                },
-                              })}
-                              className="text-primary-600 hover:text-primary-800 font-medium text-sm"
-                            >
-                              Trade
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
+                      <>
+                        <tr 
+                          key={stock.ticker} 
+                          className="hover:bg-gray-50 cursor-pointer"
+                          onClick={() => setExpandedStock(expandedStock === stock.ticker ? null : stock.ticker)}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-semibold text-gray-900">{stock.ticker}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{stock.name}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="text-sm font-medium text-gray-900">
+                              {stock.price.toFixed(2)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className={`text-sm font-medium flex items-center justify-end gap-1 ${
+                              stock.change >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {stock.change >= 0 ? (
+                                <TrendingUp className="w-4 h-4" />
+                              ) : (
+                                <TrendingDown className="w-4 h-4" />
+                              )}
+                              {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className={`text-sm font-medium ${
+                              stock.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-500">{stock.sector}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="text-sm text-gray-500">
+                              {(stock.volume / 1000000).toFixed(2)}M
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setExpandedStock(expandedStock === stock.ticker ? null : stock.ticker)
+                                }}
+                                className="text-primary-600 hover:text-primary-800 font-medium text-sm"
+                              >
+                                {expandedStock === stock.ticker ? 'Hide Chart' : 'View Chart'}
+                              </button>
+                              <span className="text-gray-300">|</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setTradeModal({
+                                    isOpen: true,
+                                    instrument: {
+                                      symbol: stock.ticker,
+                                      name: stock.name,
+                                      price: stock.price,
+                                      type: 'STOCK',
+                                    },
+                                  })
+                                }}
+                                className="text-primary-600 hover:text-primary-800 font-medium text-sm"
+                              >
+                                Trade
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                        {/* Expanded Chart Row */}
+                        {expandedStock === stock.ticker && (
+                          <tr>
+                            <td colSpan={8} className="px-0 py-0 bg-gray-50">
+                              <div className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                  <div>
+                                    <h3 className="text-xl font-bold text-gray-800">{stock.ticker}</h3>
+                                    <p className="text-sm text-gray-600">{stock.name}</p>
+                                    <div className="flex items-center gap-4 mt-2">
+                                      <div>
+                                        <span className="text-xs text-gray-500">Price: </span>
+                                        <span className="text-lg font-semibold text-gray-900">MYR {stock.price.toFixed(2)}</span>
+                                      </div>
+                                      <div>
+                                        <span className="text-xs text-gray-500">Change: </span>
+                                        <span className={`text-lg font-semibold ${stock.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                          {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)} ({stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%)
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-xs text-gray-500">Volume: </span>
+                                        <span className="text-sm font-medium text-gray-700">{(stock.volume / 1000000).toFixed(2)}M</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setExpandedStock(null)
+                                    }}
+                                    className="text-gray-400 hover:text-gray-600"
+                                  >
+                                    <X className="w-6 h-6" />
+                                  </button>
+                                </div>
+                                <div className="bg-white rounded-lg border border-gray-200" style={{ height: '500px' }}>
+                                  <TradingViewWidget
+                                    symbol={`MYX:${stock.ticker}`}
+                                    width="100%"
+                                    height="500"
+                                    interval="D"
+                                  />
+                                </div>
+                                <div className="mt-4 flex gap-4">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setTradeModal({
+                                        isOpen: true,
+                                        instrument: {
+                                          symbol: stock.ticker,
+                                          name: stock.name,
+                                          price: stock.price,
+                                          type: 'STOCK',
+                                        },
+                                      })
+                                    }}
+                                    className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+                                  >
+                                    Trade {stock.ticker}
+                                  </button>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
                     ))}
                   </tbody>
                 </table>
