@@ -153,7 +153,7 @@ export default function SettingsPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="font-medium text-gray-800 mb-1">Contact Support</p>
               <p className="text-sm text-gray-500 mb-2">
-                Email: support@fotrading.demo
+                Email: support@xentro.demo
               </p>
               <p className="text-sm text-gray-500">
                 Phone: +60 3-XXXX XXXX (Demo Only)

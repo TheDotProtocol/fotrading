@@ -7,7 +7,7 @@ import { Footer } from '@/components/Footer'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'FO Trading - Malaysian Stock Trading Platform',
+  title: 'Xentro - Malaysian Stock Trading Platform',
   description: 'Trade Bursa Malaysia stocks with ease. Demo platform for testing and demonstration purposes only.',
 }
 

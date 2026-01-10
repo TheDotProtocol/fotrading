@@ -6,9 +6,9 @@ export function Footer() {
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white font-semibold mb-4">FO Trading</h3>
+            <h3 className="text-white font-semibold mb-4">Xentro</h3>
             <p className="text-sm">
-              A modern platform for Malaysian investors trading Bursa Malaysia stocks.
+              A modern platform for Malaysian investors trading stocks, futures, forex, ETFs, bonds, and cryptocurrencies.
             </p>
           </div>
           <div>
@@ -40,7 +40,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@fotrading.demo" className="hover:text-white">
+                <a href="mailto:support@xentro.demo" className="hover:text-white">
                   Contact Us
                 </a>
               </li>
@@ -54,7 +54,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} FO Trading Demo. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Xentro Demo. All rights reserved.</p>
         </div>
       </div>
     </footer>

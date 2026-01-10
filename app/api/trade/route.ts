@@ -53,6 +53,11 @@ export async function POST(request: NextRequest) {
     // Bonds: qty * price (as percentage) * face value (assume MYR 1000)
     amount = qty * (price / 100) * 1000;
     fees = calculateFees(amount, qty);
+  } else if (instrumentType === 'CRYPTO') {
+    // Cryptocurrency: qty * price, typically lower fees
+    amount = qty * price;
+    const tradingFee = amount * 0.001; // 0.1% trading fee
+    fees = { brokerage: tradingFee, clearing: 0, stamp: 0, total: tradingFee };
   } else {
     // Stocks and ETFs
     amount = qty * price;

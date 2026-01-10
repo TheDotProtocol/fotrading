@@ -92,8 +92,8 @@ export default function PortfolioPage() {
     value: Math.round(value),
   }))
 
-  // Generate Mr FO AI recommendations
-  const generateMrFOInsights = () => {
+  // Generate My Xentro AI recommendations
+  const generateMyXentroInsights = () => {
     const insights: Array<{ type: 'diversify' | 'sell' | 'hold'; message: string; ticker?: string }> = []
     
     // Check for diversification needs
@@ -133,14 +133,14 @@ export default function PortfolioPage() {
     return insights
   }
 
-  const mrFOInsights = generateMrFOInsights()
+  const myXentroInsights = generateMyXentroInsights()
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Portfolio</h1>
 
-        {/* Mr FO AI Section */}
+        {/* My Xentro AI Section */}
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-6 mb-6">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0">
@@ -150,11 +150,11 @@ export default function PortfolioPage() {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-2xl font-bold text-gray-800">Mr FO</h2>
+                <h2 className="text-2xl font-bold text-gray-800">My Xentro</h2>
                 <span className="text-sm text-gray-500">Your AI Trading Assistant</span>
               </div>
               <div className="space-y-3">
-                {mrFOInsights.map((insight, index) => (
+                {myXentroInsights.map((insight, index) => (
                   <div
                     key={index}
                     className={`p-4 rounded-lg ${

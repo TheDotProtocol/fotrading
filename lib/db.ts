@@ -23,7 +23,7 @@ const db: Database = {
 };
 
 // Seed demo user
-const demoUser = generateMockUser('demo@fotrading.demo', 'Demo User');
+const demoUser = generateMockUser('demo@xentro.demo', 'Demo User');
 demoUser.kycStatus = 'APPROVED';
 demoUser.riskCategory = 'Retail';
 db.users.set(demoUser.id, demoUser);

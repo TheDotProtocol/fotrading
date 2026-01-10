@@ -1,6 +1,6 @@
 # 🚀 Quick Deployment Steps
 
-Follow these steps to deploy your FO Trading app to Vercel:
+Follow these steps to deploy your Xentro app to Vercel:
 
 ## Step 1: Initialize Git (if not done)
 
@@ -8,13 +8,13 @@ Follow these steps to deploy your FO Trading app to Vercel:
 cd /Users/macbook/Desktop/Exchange
 git init
 git add .
-git commit -m "Initial commit: FO Trading MVP prototype"
+git commit -m "Initial commit: Xentro MVP prototype"
 ```
 
 ## Step 2: Create GitHub Repository
 
 1. Go to https://github.com/new
-2. Repository name: `fo-trading-app`
+2. Repository name: `xentro-app`
 3. Choose **Private** (recommended) or **Public**
 4. **DO NOT** check "Initialize with README"
 5. Click **"Create repository"**
@@ -23,7 +23,7 @@ git commit -m "Initial commit: FO Trading MVP prototype"
 
 ```bash
 # Replace YOUR_USERNAME with your actual GitHub username
-git remote add origin https://github.com/YOUR_USERNAME/fo-trading-app.git
+git remote add origin https://github.com/YOUR_USERNAME/xentro-app.git
 git branch -M main
 git push -u origin main
 ```
@@ -38,10 +38,10 @@ git push -u origin main
 1. Go to https://vercel.com
 2. Sign up/Login with GitHub
 3. Click **"Add New..."** → **"Project"**
-4. Import your `fo-trading-app` repository
+4. Import your `xentro-app` repository
 5. Click **"Deploy"** (Vercel auto-detects Next.js settings)
 6. Wait 2-3 minutes
-7. Get your live URL: `https://fo-trading-app.vercel.app`
+7. Get your live URL: `https://xentro-app.vercel.app`
 
 ## Step 5: Test & Share
 
@@ -53,7 +53,7 @@ git push -u origin main
    - ✅ Trading
    - ✅ Portfolio
 3. Share URL with client:
-   - Demo email: `demo@fotrading.demo`
+   - Demo email: `demo@xentro.demo`
    - Password: Any password (demo mode)
 
 ## ✅ That's It!

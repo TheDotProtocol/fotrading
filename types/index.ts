@@ -57,7 +57,7 @@ export interface Order {
   totalAmount: number;
   createdAt: string;
   filledAt?: string;
-  instrumentType?: 'STOCK' | 'FUTURE' | 'FOREX' | 'ETF' | 'BOND';
+  instrumentType?: 'STOCK' | 'FUTURE' | 'FOREX' | 'ETF' | 'BOND' | 'CRYPTO';
   contractSize?: number; // For futures
   lotSize?: number; // For forex
   margin?: number; // For futures/forex

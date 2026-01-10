@@ -47,7 +47,7 @@
 1. User clicks on a stock (e.g., MAYBANK)
 2. Chart loads directly in the app (no redirect)
 3. User can interact with chart (zoom, pan, add indicators)
-4. All analysis happens within FO Trading app
+4. All analysis happens within Xentro app
 5. User can place trades based on chart analysis
 
 ### ⚙️ Customization Options

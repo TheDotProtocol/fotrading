@@ -40,7 +40,7 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 ## 📝 Demo Credentials
 
 ### Pre-seeded Demo Account
-- **Email:** `demo@fotrading.demo`
+- **Email:** `demo@xentro.demo`
 - **Password:** Any password (demo mode accepts any credentials)
 
 ### New Account
@@ -175,7 +175,7 @@ The app includes 10 Bursa Malaysia stocks:
 Prices auto-update every 15 seconds with ±5% variance.
 
 ### Demo Portfolio
-The demo account (`demo@fotrading.demo`) comes with:
+The demo account (`demo@xentro.demo`) comes with:
 - Pre-approved KYC status
 - Sample holdings (MAYBANK, CIMB)
 - Starting cash balance

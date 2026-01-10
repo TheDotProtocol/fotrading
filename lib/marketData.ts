@@ -1,4 +1,4 @@
-import { MarketIndex, Future, Currency, ETF, Bond } from '@/types/market';
+import { MarketIndex, Future, Currency, ETF, Bond, Cryptocurrency } from '@/types/market';
 
 export const marketIndices: MarketIndex[] = [
   { symbol: 'KLCI', name: 'FTSE Bursa Malaysia KLCI Index', value: 1523.45, change: 12.34, changePercent: 0.82 },
@@ -48,5 +48,18 @@ export const bonds: Bond[] = [
   { symbol: 'MY10Y', name: 'Malaysia 10 Year Government Bonds', coupon: 3.48, yield: 3.52, maturity: 'Jul 3, 2035', price: 99.45 },
   { symbol: 'MY20Y', name: 'Malaysia 20 Year Government Bonds', coupon: 4.18, yield: 4.22, maturity: 'May 17, 2044', price: 98.90 },
   { symbol: 'MY30Y', name: 'Malaysia 30 Year Government Bonds', coupon: 4.46, yield: 4.50, maturity: 'Apr 1, 2053', price: 98.25 },
+];
+
+export const cryptocurrencies: Cryptocurrency[] = [
+  { symbol: 'BTCUSDT', name: 'Bitcoin', price: 43250.50, change: 1250.30, changePercent: 2.98, volume: 28500000000, marketCap: 850000000000 },
+  { symbol: 'ETHUSDT', name: 'Ethereum', price: 2650.75, change: -45.20, changePercent: -1.68, volume: 15200000000, marketCap: 318000000000 },
+  { symbol: 'BNBUSDT', name: 'Binance Coin', price: 315.20, change: 8.50, changePercent: 2.77, volume: 1200000000, marketCap: 48000000000 },
+  { symbol: 'SOLUSDT', name: 'Solana', price: 98.45, change: 3.20, changePercent: 3.36, volume: 2100000000, marketCap: 45000000000 },
+  { symbol: 'ADAUSDT', name: 'Cardano', price: 0.52, change: 0.02, changePercent: 4.00, volume: 450000000, marketCap: 18500000000 },
+  { symbol: 'XRPUSDT', name: 'Ripple', price: 0.62, change: -0.01, changePercent: -1.59, volume: 1200000000, marketCap: 34000000000 },
+  { symbol: 'DOGEUSDT', name: 'Dogecoin', price: 0.085, change: 0.003, changePercent: 3.66, volume: 850000000, marketCap: 12000000000 },
+  { symbol: 'DOTUSDT', name: 'Polkadot', price: 7.25, change: 0.15, changePercent: 2.11, volume: 320000000, marketCap: 9500000000 },
+  { symbol: 'MATICUSDT', name: 'Polygon', price: 0.88, change: 0.02, changePercent: 2.33, volume: 450000000, marketCap: 8500000000 },
+  { symbol: 'LINKUSDT', name: 'Chainlink', price: 14.50, change: -0.30, changePercent: -2.03, volume: 280000000, marketCap: 8500000000 },
 ];
 

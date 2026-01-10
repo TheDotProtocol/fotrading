@@ -1,8 +1,8 @@
-# Deployment Guide - FO Trading App
+# Deployment Guide - Xentro App
 
 ## 🚀 Deploying to Vercel via GitHub
 
-This guide will help you deploy the FO Trading app to Vercel so your client can test the prototype.
+This guide will help you deploy the Xentro app to Vercel so your client can test the prototype.
 
 ---
 
@@ -43,7 +43,7 @@ git init
 git add .
 
 # Create initial commit
-git commit -m "Initial commit: FO Trading MVP prototype"
+git commit -m "Initial commit: Xentro MVP prototype"
 ```
 
 ---
@@ -51,7 +51,7 @@ git commit -m "Initial commit: FO Trading MVP prototype"
 ## Step 3: Create GitHub Repository
 
 1. Go to https://github.com/new
-2. Repository name: `fo-trading-app` (or your preferred name)
+2. Repository name: `xentro-app` (or your preferred name)
 3. Description: "Malaysian Stock Trading App Prototype - MVP Demo"
 4. Choose: **Private** (recommended for client demos) or **Public**
 5. **DO NOT** initialize with README, .gitignore, or license (we already have these)
@@ -65,7 +65,7 @@ GitHub will show you commands. Run these in your terminal:
 
 ```bash
 # Add GitHub as remote (replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/fo-trading-app.git
+git remote add origin https://github.com/YOUR_USERNAME/xentro-app.git
 
 # Rename branch to main (if needed)
 git branch -M main
@@ -93,7 +93,7 @@ git push -u origin main
 ### 5.2 Import Project
 
 1. In Vercel dashboard, click **"Add New..."** → **"Project"**
-2. Find your `fo-trading-app` repository
+2. Find your `xentro-app` repository
 3. Click **"Import"**
 
 ### 5.3 Configure Project
@@ -110,7 +110,7 @@ Vercel will auto-detect Next.js settings. Verify:
 
 1. Click **"Deploy"**
 2. Wait 2-3 minutes for build to complete
-3. Vercel will provide a URL like: `https://fo-trading-app.vercel.app`
+3. Vercel will provide a URL like: `https://xentro-app.vercel.app`
 
 ---
 
@@ -128,9 +128,9 @@ Vercel will auto-detect Next.js settings. Verify:
 
 ## Step 7: Share with Client
 
-1. **Get the Vercel URL** (e.g., `https://fo-trading-app.vercel.app`)
+1. **Get the Vercel URL** (e.g., `https://xentro-app.vercel.app`)
 2. **Share credentials**:
-   - Email: `demo@fotrading.demo`
+   - Email: `demo@xentro.demo`
    - Password: `demo123`
    - Or they can register a new account
 

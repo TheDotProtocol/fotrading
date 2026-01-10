@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useStore } from '@/lib/store'
 import { Stock } from '@/types'
-import { Search, TrendingUp, TrendingDown, BarChart3, Coins, DollarSign, TrendingUp as FutureIcon, Globe } from 'lucide-react'
+import { Search, TrendingUp, TrendingDown, BarChart3, Coins, DollarSign, TrendingUp as FutureIcon, Globe, Bitcoin } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { TradingViewMarketOverview } from '@/components/TradingViewWidget'
-import { marketIndices, futures, currencies, etfs, bonds } from '@/lib/marketData'
+import { marketIndices, futures, currencies, etfs, bonds, cryptocurrencies } from '@/lib/marketData'
 import { TradeModal } from '@/components/TradeModal'
 
-type MarketTab = 'overview' | 'indices' | 'stocks' | 'futures' | 'forex' | 'etfs' | 'bonds'
+type MarketTab = 'overview' | 'indices' | 'stocks' | 'futures' | 'forex' | 'etfs' | 'bonds' | 'crypto'
 
 export default function MarketPage() {
   const router = useRouter()
@@ -95,6 +95,7 @@ export default function MarketPage() {
     { id: 'forex' as MarketTab, label: 'Forex & Currencies', icon: DollarSign },
     { id: 'etfs' as MarketTab, label: 'ETFs', icon: Globe },
     { id: 'bonds' as MarketTab, label: 'Bonds', icon: TrendingDown },
+    { id: 'crypto' as MarketTab, label: 'Cryptocurrency', icon: Bitcoin },
   ]
 
   return (
@@ -501,6 +502,71 @@ export default function MarketPage() {
                               name: etf.name,
                               price: etf.price,
                               type: 'ETF',
+                            },
+                          })}
+                          className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                        >
+                          Trade
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Cryptocurrency Tab */}
+        {activeTab === 'crypto' && (
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="p-6 border-b">
+              <h2 className="text-xl font-semibold">Cryptocurrency Markets</h2>
+              <p className="text-sm text-gray-500 mt-1">Trade cryptocurrencies 24/7 with low fees</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Symbol</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Price (USDT)</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Change</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Change %</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">24h Volume</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {cryptocurrencies.map((crypto) => (
+                    <tr key={crypto.symbol} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 font-semibold text-gray-900">{crypto.symbol}</td>
+                      <td className="px-6 py-4 text-gray-900">{crypto.name}</td>
+                      <td className="px-6 py-4 text-right font-medium text-gray-900">
+                        {crypto.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td className={`px-6 py-4 text-right font-medium ${
+                        crypto.change >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {crypto.change >= 0 ? '+' : ''}{crypto.change.toFixed(2)}
+                      </td>
+                      <td className={`px-6 py-4 text-right font-medium ${
+                        crypto.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {crypto.changePercent >= 0 ? '+' : ''}{crypto.changePercent.toFixed(2)}%
+                      </td>
+                      <td className="px-6 py-4 text-right text-sm text-gray-500">
+                        ${(crypto.volume / 1000000).toFixed(0)}M
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          onClick={() => setTradeModal({
+                            isOpen: true,
+                            instrument: {
+                              symbol: crypto.symbol,
+                              name: crypto.name,
+                              price: crypto.price,
+                              type: 'CRYPTO',
                             },
                           })}
                           className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"

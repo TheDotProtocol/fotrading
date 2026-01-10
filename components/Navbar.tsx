@@ -19,7 +19,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
             <Wallet className="w-8 h-8 text-primary-600" />
-            <span className="text-xl font-bold text-gray-800">FO Trading</span>
+            <span className="text-xl font-bold text-gray-800">Xentro</span>
           </Link>
 
           {/* Desktop Menu */}

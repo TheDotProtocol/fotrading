@@ -14,7 +14,7 @@ Visit http://localhost:3000
 
 ## Demo Account
 
-**Email:** `demo@fotrading.demo`  
+**Email:** `demo@xentro.demo`  
 **Password:** Any password (demo mode)
 
 ## Quick Test Flow

@@ -10,7 +10,7 @@ interface TradeModalProps {
     symbol: string
     name: string
     price: number
-    type: 'STOCK' | 'FUTURE' | 'FOREX' | 'ETF' | 'BOND'
+    type: 'STOCK' | 'FUTURE' | 'FOREX' | 'ETF' | 'BOND' | 'CRYPTO'
     contractSize?: number
     lotSize?: number
   }
@@ -90,6 +90,15 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
         fees: { brokerage: amount * 0.001, clearing: amount * 0.0003, stamp: 0, total: amount * 0.0013 },
         grandTotal: amount * 1.0013,
       }
+    } else if (instrument.type === 'CRYPTO') {
+      // Cryptocurrency: qty * price, typically lower fees than stocks
+      amount = quantity * instrument.price
+      const tradingFee = amount * 0.001 // 0.1% trading fee (typical for crypto exchanges)
+      return {
+        amount,
+        fees: { brokerage: tradingFee, clearing: 0, stamp: 0, total: tradingFee },
+        grandTotal: amount + tradingFee,
+      }
     } else {
       // Stocks and ETFs
       amount = quantity * instrument.price
@@ -140,6 +149,14 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
           qtyPlaceholder: 'Enter number of bond units',
           note: 'Face value typically MYR 100 per unit. Price shown as percentage of face value.',
         }
+      case 'CRYPTO':
+        return {
+          title: 'Cryptocurrency Trading',
+          description: 'Trade cryptocurrencies 24/7. Buy or sell digital assets with low fees and instant settlement.',
+          qtyLabel: 'Amount',
+          qtyPlaceholder: 'Enter amount to trade',
+          note: 'Cryptocurrency trading is available 24/7. Trading fee: 0.1%. Prices in USDT.',
+        }
       default:
         return {
           title: 'Stock Trading',
@@ -175,6 +192,8 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
               ? `${instrument.price.toFixed(2)}%` 
               : instrument.type === 'FOREX'
               ? instrument.price.toFixed(4)
+              : instrument.type === 'CRYPTO'
+              ? `USDT ${instrument.price.toFixed(2)}`
               : `MYR ${instrument.price.toFixed(2)}`}
           </p>
         </div>
@@ -203,7 +222,7 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
                 }`}
               >
                 <TrendingUp className="w-5 h-5" />
-                {instrument.type === 'FUTURE' || instrument.type === 'FOREX' ? 'LONG' : 'BUY'}
+                {instrument.type === 'FUTURE' || instrument.type === 'FOREX' || instrument.type === 'CRYPTO' ? 'LONG' : 'BUY'}
               </button>
               <button
                 type="button"
@@ -215,10 +234,10 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
                 }`}
               >
                 <TrendingDown className="w-5 h-5" />
-                {instrument.type === 'FUTURE' || instrument.type === 'FOREX' ? 'SHORT' : 'SELL'}
+                {instrument.type === 'FUTURE' || instrument.type === 'FOREX' || instrument.type === 'CRYPTO' ? 'SHORT' : 'SELL'}
               </button>
             </div>
-            {instrument.type === 'FUTURE' && (
+            {(instrument.type === 'FUTURE' || instrument.type === 'CRYPTO') && (
               <p className="text-xs text-gray-500 mt-2">
                 LONG = Buy (profit if price goes up) | SHORT = Sell (profit if price goes down)
               </p>
@@ -262,10 +281,10 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {info.qtyLabel}
             </label>
-            <input
-              type="number"
-              step={instrument.type === 'FOREX' ? '0.01' : '1'}
-              min="0.01"
+                <input
+                type="number"
+                step={instrument.type === 'FOREX' || instrument.type === 'CRYPTO' ? '0.01' : '1'}
+                min="0.01"
               value={qty}
               onChange={(e) => setQty(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 text-gray-900"
@@ -302,6 +321,8 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
                     ? `MYR ${calculation.amount.toFixed(2)}`
                     : instrument.type === 'FOREX'
                     ? `MYR ${calculation.amount.toLocaleString()}`
+                    : instrument.type === 'CRYPTO'
+                    ? `USDT ${calculation.amount.toFixed(2)}`
                     : `MYR ${calculation.amount.toFixed(2)}`}
                 </span>
               </div>
@@ -330,6 +351,8 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
                 <span className="text-lg">
                   {instrument.type === 'FOREX'
                     ? `MYR ${calculation.grandTotal.toLocaleString()}`
+                    : instrument.type === 'CRYPTO'
+                    ? `USDT ${calculation.grandTotal.toFixed(2)}`
                     : `MYR ${calculation.grandTotal.toFixed(2)}`}
                 </span>
               </div>
@@ -353,7 +376,7 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
                 : 'bg-red-600 hover:bg-red-700 text-white'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            Confirm {tradeType === 'BUY' ? (instrument.type === 'FUTURE' || instrument.type === 'FOREX' ? 'LONG' : 'BUY') : (instrument.type === 'FUTURE' || instrument.type === 'FOREX' ? 'SHORT' : 'SELL')}
+            Confirm {tradeType === 'BUY' ? (instrument.type === 'FUTURE' || instrument.type === 'FOREX' || instrument.type === 'CRYPTO' ? 'LONG' : 'BUY') : (instrument.type === 'FUTURE' || instrument.type === 'FOREX' || instrument.type === 'CRYPTO' ? 'SHORT' : 'SELL')}
           </button>
         </div>
 
@@ -362,6 +385,7 @@ export function TradeModal({ isOpen, onClose, instrument, onTrade }: TradeModalP
             <strong>⚠️ Demo Mode:</strong> All trades are simulated. No real money or positions are created.
             {instrument.type === 'FUTURE' && ' Futures trading involves high risk due to leverage.'}
             {instrument.type === 'FOREX' && ' Forex trading involves high risk due to leverage and market volatility.'}
+            {instrument.type === 'CRYPTO' && ' Cryptocurrency trading involves high risk due to extreme volatility. Trade responsibly.'}
           </p>
         </div>
       </div>
